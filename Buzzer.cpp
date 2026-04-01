@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "buzzer.h"
+#include "NeoPixelStatus.h"
 
 // простая генерация звука
 void playTone(int pin, int frequency, int duration) {
@@ -13,6 +14,7 @@ void playTone(int pin, int frequency, int duration) {
         delayMicroseconds(halfPeriod);
         digitalWrite(pin, LOW);
         delayMicroseconds(halfPeriod);
+        updateRobotLights();
     }
 }
 

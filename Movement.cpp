@@ -2,6 +2,7 @@
 #include "Config.h"
 #include "ServoControl.h"
 #include "Sensors.h"
+#include "NeoPixelStatus.h"
 
 void stopMotors() {
   digitalWrite(LEFT_FORWARD, LOW);
@@ -16,6 +17,8 @@ void pauseAfterAction() {
 }
 
 void moveForward(float meters) {
+  setRobotLightsMoving();
+
   analogWrite(LEFT_FORWARD, LEFT_SPEED_FORWARD);
   digitalWrite(LEFT_REVERSE, LOW);
 
@@ -33,6 +36,8 @@ void moveForward(float meters) {
 }
 
 void moveBackward(float meters) {
+  setRobotLightsMoving();
+
   digitalWrite(LEFT_FORWARD, LOW);
   analogWrite(LEFT_REVERSE, LEFT_SPEED_BACKWARD);
 
@@ -50,6 +55,8 @@ void moveBackward(float meters) {
 }
 
 void microForward(float meters) {
+  setRobotLightsMoving();
+
   analogWrite(LEFT_FORWARD, LEFT_SPEED_FORWARD);
   digitalWrite(LEFT_REVERSE, LOW);
 
@@ -67,6 +74,8 @@ void microForward(float meters) {
 }
 
 void turnRight(int degree) {
+  setRobotLightsTurningRight();
+
   analogWrite(LEFT_FORWARD, LEFT_SPEED_FORWARD);
   digitalWrite(LEFT_REVERSE, LOW);
 
@@ -84,6 +93,8 @@ void turnRight(int degree) {
 }
 
 void turnLeft(int degree) {
+  setRobotLightsTurningLeft();
+
   digitalWrite(LEFT_FORWARD, LOW);
   analogWrite(LEFT_REVERSE, LEFT_SPEED_BACKWARD);
 

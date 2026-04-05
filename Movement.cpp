@@ -4,6 +4,8 @@
 #include "Sensors.h"
 #include "NeoPixelStatus.h"
 
+// Immediately disables all motor control signals.
+// This function is the basic safety stop used throughout the motion subsystem.
 void stopMotors() {
   digitalWrite(LEFT_FORWARD, LOW);
   digitalWrite(LEFT_REVERSE, LOW);
@@ -11,11 +13,15 @@ void stopMotors() {
   digitalWrite(RIGHT_REVERSE, LOW);
 }
 
+// Stops the robot and inserts a short stabilization pause after an action.
+// The pause helps prevent command overlap between consecutive movements.
 void pauseAfterAction() {
   stopMotors();
   waitWithServo(ACTION_PAUSE_MS);
 }
 
+// Moves the robot forward for a distance estimated from time calibration.
+// During motion, the servo subsystem continues to update in the background.
 void moveForward(float meters) {
   setRobotLightsMoving();
 
@@ -35,6 +41,8 @@ void moveForward(float meters) {
   stopMotors();
 }
 
+// Moves the robot backward for a calibrated time corresponding to the requested distance.
+// Servo refresh is preserved during the movement interval.
 void moveBackward(float meters) {
   setRobotLightsMoving();
 
@@ -54,6 +62,8 @@ void moveBackward(float meters) {
   stopMotors();
 }
 
+// Performs a short forward movement using the same timed-motion model as moveForward().
+// In practice, this is used for fine positioning and small corrective advances.
 void microForward(float meters) {
   setRobotLightsMoving();
 
@@ -73,6 +83,8 @@ void microForward(float meters) {
   stopMotors();
 }
 
+// Rotates the robot to the right using differential wheel motion.
+// The turn angle is approximated through a calibrated time-per-degree constant.
 void turnRight(int degree) {
   setRobotLightsTurningRight();
 
@@ -92,6 +104,8 @@ void turnRight(int degree) {
   stopMotors();
 }
 
+// Rotates the robot to the left using differential wheel motion.
+// As in right turns, the rotation is time-based rather than encoder-based.
 void turnLeft(int degree) {
   setRobotLightsTurningLeft();
 
@@ -111,16 +125,21 @@ void turnLeft(int degree) {
   stopMotors();
 }
 
+// Applies a right correction and then pauses to stabilize the robot before the next action.
 void correctRight(int deg) {
   turnRight(deg);
   pauseAfterAction();
 }
 
+// Applies a left correction and then pauses to stabilize the robot before the next action.
 void correctLeft(int deg) {
   turnLeft(deg);
   pauseAfterAction();
 }
 
+// Turns the robot slightly left and then advances only if the front path remains clear.
+// function first checks safety, performs the correction,
+// and only then makes a short forward step when no front obstacle is detected.
 void correctLeftAndAdvance(int deg) {
   float frontDist = readDistanceCm(trigPin, echoPin);
 
@@ -142,6 +161,8 @@ void correctLeftAndAdvance(int deg) {
   }
 }
 
+// Turns the robot slightly right and then advances only if the front path remains clear.
+// This is the symmetric counterpart of correctLeftAndAdvance().
 void correctRightAndAdvance(int deg) {
   float frontDist = readDistanceCm(trigPin, echoPin);
 
@@ -163,6 +184,8 @@ void correctRightAndAdvance(int deg) {
   }
 }
 
+// Executes a short forward movement followed by a pause.
+// This helper provides a compact way to request a small discrete advance.
 void smallForward() {
   moveForward(0.05);
   pauseAfterAction();

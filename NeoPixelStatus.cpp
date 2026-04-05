@@ -2,10 +2,13 @@
 #include <Adafruit_NeoPixel.h>
 
 namespace {
+  // Internal NeoPixel strip instance and state flags.
+  // stripReady ensures safe usage only after initialization.
   Adafruit_NeoPixel strip;
   bool stripReady = false;
   uint8_t totalPixels = 0;
 
+  // Defines high-level lighting modes corresponding to robot states.
   enum LightState {
     LIGHT_WAITING,
     LIGHT_MOVING,
@@ -15,18 +18,22 @@ namespace {
 
   LightState currentState = LIGHT_WAITING;
 
+  // Variables used for non-blocking flashing animation in FINISHED state.
   unsigned long lastFlashMs = 0;
   uint8_t flashStep = 0;
 
   const uint16_t FLASH_INTERVAL_MS = 180;
   const uint32_t TURN_YELLOW = Adafruit_NeoPixel::Color(255, 140, 0);
 
-  // Expected order: 0=front-left, 1=front-right, 2=back-right, 3=back-left.
+  // Fixed logical mapping of LEDs to robot orientation.
+  // This allows directional signaling (left/right turns).
   const uint8_t FRONT_LEFT_INDEX = 0;
   const uint8_t FRONT_RIGHT_INDEX = 1;
   const uint8_t BACK_RIGHT_INDEX = 2;
   const uint8_t BACK_LEFT_INDEX = 3;
 
+  // Sets all pixels to the same color.
+  // Used as the base operation for most lighting states.
   void fillAll(uint32_t color) {
     if (!stripReady) {
       return;
@@ -38,10 +45,13 @@ namespace {
     strip.show();
   }
 
+  // Turns off all LEDs.
   void clearAll() {
     fillAll(strip.Color(0, 0, 0));
   }
 
+  // Displays turn indication on one side of the robot.
+  // If there are fewer than 4 LEDs, fallback to full strip indication.
   void setTurningSide(bool isLeftTurn) {
     if (!stripReady) {
       return;
@@ -66,6 +76,8 @@ namespace {
   }
 }
 
+// Initializes the NeoPixel strip and sets the initial state.
+// Must be called before any other lighting function.
 void initRobotLights(uint8_t dataPin, uint8_t pixelCount) {
   totalPixels = pixelCount;
   strip = Adafruit_NeoPixel(totalPixels, dataPin, NEO_GRB + NEO_KHZ800);
@@ -76,11 +88,15 @@ void initRobotLights(uint8_t dataPin, uint8_t pixelCount) {
   setRobotLightsWaiting();
 }
 
+// Sets the robot to waiting state (e.g., before start).
+// Uses solid red to indicate idle/standby.
 void setRobotLightsWaiting() {
   currentState = LIGHT_WAITING;
   fillAll(strip.Color(255, 0, 0));
 }
 
+// Sets the robot to moving state.
+// Uses white light to indicate active motion.
 void setRobotLightsMoving() {
   if (currentState == LIGHT_FINISHED) {
     return;
@@ -90,6 +106,8 @@ void setRobotLightsMoving() {
   fillAll(strip.Color(255, 255, 255));
 }
 
+// Activates left turn indication.
+// Only updates if the robot is not in finished state.
 void setRobotLightsTurningLeft() {
   if (currentState == LIGHT_FINISHED) {
     return;
@@ -99,6 +117,8 @@ void setRobotLightsTurningLeft() {
   setTurningSide(true);
 }
 
+// Activates right turn indication.
+// Only updates if the robot is not in finished state.
 void setRobotLightsTurningRight() {
   if (currentState == LIGHT_FINISHED) {
     return;
@@ -108,12 +128,16 @@ void setRobotLightsTurningRight() {
   setTurningSide(false);
 }
 
+// Switches to finished state and resets flashing animation.
+// From this point, other lighting updates are ignored.
 void setRobotLightsFinished() {
   currentState = LIGHT_FINISHED;
   flashStep = 0;
   lastFlashMs = 0;
 }
 
+// Updates lighting in finished state.
+// Implements a non-blocking RGB cycling effect.
 void updateRobotLights() {
   if (!stripReady) {
     return;
@@ -124,6 +148,8 @@ void updateRobotLights() {
   }
 
   unsigned long now = millis();
+
+  // Ensures fixed timing between color changes.
   if (lastFlashMs != 0 && (now - lastFlashMs) < FLASH_INTERVAL_MS) {
     return;
   }

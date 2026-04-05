@@ -1,6 +1,8 @@
 #include "ServoControl.h"
 #include "Config.h"
 
+// Sends ONE pulse to the servo
+// pulseUs = how long the signal stays HIGH (in microseconds)
 void servoPulse(int pulseUs) {
   digitalWrite(SERVO_PIN, HIGH);
   delayMicroseconds(pulseUs);

@@ -56,4 +56,8 @@ extern const int LEFT_TURN_DEG;
 extern const int RIGHT_TURN_DEG;
 extern const int UTURN_DEG;
 
+extern const uint8_t NEOPIXEL_DATA_PIN;
+extern const uint8_t NEOPIXEL_COUNT;
+extern const uint8_t NEOPIXEL_UNUSED_DO_PIN;
+
 #endif

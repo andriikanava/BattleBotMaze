@@ -51,3 +51,7 @@ const int RIGHT_TURN_DEG  = 65;
 const int UTURN_DEG       = 150;
 
 const int buzzerPin = 7;
+
+const uint8_t NEOPIXEL_DATA_PIN = 4;
+const uint8_t NEOPIXEL_COUNT = 4;
+const uint8_t NEOPIXEL_UNUSED_DO_PIN = 2;

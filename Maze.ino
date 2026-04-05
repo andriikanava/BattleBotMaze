@@ -7,11 +7,6 @@
 #include "Buzzer.h"
 #include "NeoPixelStatus.h"
 
-// NeoPixel configuration parameters.
-const uint8_t NEOPIXEL_DATA_PIN = 4;
-const uint8_t NEOPIXEL_COUNT = 4;
-const uint8_t NEOPIXEL_UNUSED_DO_PIN = 2;
-
 void setup() {
   // Initialize communication and hardware interfaces.
   Serial.begin(9600);
